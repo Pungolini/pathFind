@@ -1,6 +1,6 @@
-import pygame,os,math
+import pygame,os,math,sys
 from pathFind import  Path
-from grid import GridClass
+from grid import GridClass,ROWS,COLS
 
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
@@ -11,10 +11,14 @@ red = (255,128,128)
 green = (0,255,150)
 blue = (0,0,255)
 font = "Georgia.ttf"
+ALG_LIST = ("DFS","BFS","ASTAR")
+DEFAULT_ALG = "DFS"
+
+
 
 class guiClass(GridClass):
 
-    def __init__(self,grid):
+    def __init__(self,grid,algorithm = DEFAULT_ALG):
 
 
         self.grid = grid
@@ -22,7 +26,7 @@ class guiClass(GridClass):
         self.height = 600
         self.bg_color = (0xff,0xff,0xff)
         self.block_size = int(min(self.width,self.height)/max(self.grid.get_col(),self.grid.get_row()))
-
+        self.algorithm = algorithm
         self.window = None 
 
         self.gui_callback()
@@ -130,7 +134,7 @@ class guiClass(GridClass):
             x = 0
             for j in range(cols):
                 
-                if self.grid.islocked(i,j):
+                if self.grid.is_locked(i,j):
             
                     rect = pygame.Rect(x,y,self.block_size-1,self.block_size-1)
                     pygame.draw.rect(self.window,black,rect)
@@ -146,13 +150,14 @@ class guiClass(GridClass):
     def gui_callback(self):
 
         running = True
-        maze_solution = None #Path(row,col,test_grid).BFS(start,end)
+        maze_solution = False
         
-        alg = "BFS"
+        print(self.algorithm + " will be used on this run.\n")
         while not maze_solution:
+            
             print("Generating a maze with a solution...")
             test_grid.generate_maze()
-            maze_solution = eval("Path(row,col,test_grid)."+alg+"(start,end)")  #Path(row,col,test_grid).BFS(start,end)
+            maze_solution = eval("Path(rows,cols,test_grid)."+ self.algorithm +"(start,end)")  #Path(row,col,test_grid).BFS(start,end)
 
         self.create_window()
         
@@ -162,7 +167,7 @@ class guiClass(GridClass):
             r,c = maze_solution[i][0],maze_solution[i][1]
             
             
-            if self.grid.islocked(r,c):
+            if self.grid.is_locked(r,c):
                 continue
             else:
                 x = c*self.block_size
@@ -187,18 +192,39 @@ class guiClass(GridClass):
                     pygame.quit()
                     quit()
 
+
+# Checks whether the row and column args are valid
+def check_int(arg):
+    return arg.isnumeric() and int(arg) > 1
+
     
 
 if __name__ == "__main__":
 
+    rows,cols,algo = ROWS,COLS,DEFAULT_ALG
 
-    row ,col = 20,20
+    # Read grid size and algorithm from command line
+    if len(sys.argv) > 1:
+        try:
+
+            if check_int(sys.argv[1]):
+                rows = cols = int(sys.argv[1]) 
+
+
+            algo = sys.argv[2].upper()
+            algo = algo if algo in ALG_LIST else DEFAULT_ALG
+
+
+        except IndexError:
+            pass
+
+    print(rows,cols,algo)
+
     start = (0,0)
-    end = (row-1,col-1)
-    test_grid = GridClass(row,col)
+    end = (rows-1,cols-1)
 
     
 
-
-    maze = guiClass(test_grid)      
+    test_grid = GridClass(rows,cols)
+    maze = guiClass(test_grid,algo)      
     

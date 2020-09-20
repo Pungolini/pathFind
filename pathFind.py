@@ -153,7 +153,7 @@ class Path:
                         explored.add(target)
                         queue.append((target,path+[target]))
 
-        print("{} nodes explored.".format(len(explored)))
+        #print("{} nodes explored.".format(len(explored)))
 
 
 

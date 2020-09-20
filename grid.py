@@ -1,12 +1,17 @@
 
 free = 0
 LOCKED = -1
-
+# Default number of rows and colums:
+ROWS = 20
+COLS = 20
 from random import choice,seed
 
 class GridClass:
+    '''
+    Class that implements elementary operations on a grid
+    '''
     
-    def __init__(self,row, col):
+    def __init__(self,row = ROWS, col = COLS):
 
         seed()
         self.rows = row

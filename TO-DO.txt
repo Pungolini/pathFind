@@ -1,0 +1,2 @@
+- Add option to replay the run when user clicks R key
+- Make code work with non-square grids
